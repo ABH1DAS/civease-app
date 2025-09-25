@@ -2,16 +2,15 @@
   "name": "civease-app",
   "version": "1.0.0",
   "homepage": "https://abh1das.github.io/civease-app",
-    
+
   "scripts": {
+    "dev": "next dev",
+    "build": "next build && next export",
+    "start": "next start",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d build",
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
-    
+    "deploy": "gh-pages -d out"
   },
+
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
     "@radix-ui/react-accordion": "1.2.2",
@@ -65,6 +64,7 @@
     "vaul": "^0.9.9",
     "zod": "3.25.67"
   },
+
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.9",
     "@types/node": "^22",
@@ -76,4 +76,3 @@
     "typescript": "^5"
   }
 }
-
