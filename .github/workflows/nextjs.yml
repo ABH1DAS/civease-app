@@ -1,28 +1,36 @@
-name: Build Next.js
+name: Build and Deploy Jekyll Site
 
 on:
   push:
     branches:
-      - main
-  pull_request:
+      - main  # change if your default branch is different
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
         with:
-          node-version: 20
-          cache: 'npm'
+          ruby-version: 3.2 # or the version compatible with your Jekyll site
 
-      - name: Install dependencies
-        run: npm ci
+      - name: Install Bundler and dependencies
+        run: |
+          gem install bundler
+          bundle install
 
-      - name: Rebuild lightningcss
-        run: npm rebuild lightningcss
+      - name: Build Jekyll site
+        uses: actions/jekyll-build-pages@v1
+        with:
+          source: .           # <-- root folder
+          destination: ./_site # <-- output folder
 
-      - name: Build Next.js
-        run: npx next build
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v6
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./_site
