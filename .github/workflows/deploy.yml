@@ -1,0 +1,49 @@
+name: Build and Deploy Next.js
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest   # Use Windows runner if you want Windows binaries
+    steps:
+      # Checkout the repository
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      # Setup Node.js 20
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      # Install dependencies
+      - name: Install dependencies
+        run: npm ci
+
+      # Rebuild lightningcss for Linux (fixes missing .node binary)
+      - name: Rebuild lightningcss
+        run: npm rebuild lightningcss
+
+      # Run Next.js build
+      - name: Build Next.js
+        run: npx next build
+
+      # Optional: Run tests
+      - name: Run tests
+        run: npm test
+
+      # Optional: Deploy (adjust for your hosting)
+      #- name: Deploy to Vercel
+      #  uses: amondnet/vercel-action@v20
+      #  with:
+      #    vercel-token: ${{ secrets.VERCEL_TOKEN }}
+      #    vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+      #    vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+      #    working-directory: . 
