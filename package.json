@@ -72,3 +72,9 @@
     "typescript": "^5"
   }
 }
+{
+  "name": "civease-app",
+  "version": "1.0.0",
+  "homepage": "https://abh1das.github.io/civease-app",
+  ...
+}
