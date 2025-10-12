@@ -20,7 +20,6 @@ export default function ReportIssuePage() {
   const [category, setCategory] = useState("")
   const [priority, setPriority] = useState("")
   const [address, setAddress] = useState("")
-  const [images, setImages] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const [success, setSuccess] = useState(false)
@@ -43,7 +42,6 @@ export default function ReportIssuePage() {
           category,
           priority,
           location: { address },
-          images,
           citizenId: user.id,
         }),
       })
@@ -60,15 +58,6 @@ export default function ReportIssuePage() {
       setError("Failed to submit issue. Please try again.")
     } finally {
       setLoading(false)
-    }
-  }
-
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files
-    if (files) {
-      // In a real app, upload to cloud storage
-      const newImages = Array.from(files).map((file) => URL.createObjectURL(file))
-      setImages([...images, ...newImages])
     }
   }
 
@@ -178,60 +167,7 @@ export default function ReportIssuePage() {
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="images">Photos (Optional)</Label>
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-                  <Camera className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                  <p className="text-sm text-gray-600 mb-2">Upload photos to help illustrate the issue</p>
-                  <input
-                    type="file"
-                    id="images"
-                    multiple
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                    className="hidden"
-                  />
-                  <Button type="button" variant="outline" onClick={() => document.getElementById("images")?.click()}>
-                    Choose Photos
-                  </Button>
-                </div>
-
-                {images.length > 0 && (
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-4">
-                    {images.map((image, index) => (
-                      <div key={index} className="relative">
-                        <img
-                          src={image || "/placeholder.svg"}
-                          alt={`Upload ${index + 1}`}
-                          className="w-full h-24 object-cover rounded"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setImages(images.filter((_, i) => i !== index))}
-                          className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
-                        >
-                          ×
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-
               {error && (
                 <Alert variant="destructive">
                   <AlertDescription>{error}</AlertDescription>
-                </Alert>
-              )}
-
-              <Button type="submit" className="w-full" disabled={loading}>
-                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Submit Issue Report
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
-      </main>
-    </div>
-  )
-}
+                </A

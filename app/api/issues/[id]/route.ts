@@ -1,8 +1,9 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { mockIssues } from "@/lib/mock-data"
+import { getIssues, saveIssues } from "@/lib/db"
 
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
-  const issue = mockIssues.find((i) => i.id === params.id)
+  const issues = await getIssues()
+  const issue = issues.find((i) => i.id === params.id)
 
   if (!issue) {
     return NextResponse.json({ error: "Issue not found" }, { status: 404 })
@@ -14,19 +15,22 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const updates = await request.json()
-    const issueIndex = mockIssues.findIndex((i) => i.id === params.id)
+    const issues = await getIssues()
+    const issueIndex = issues.findIndex((i) => i.id === params.id)
 
     if (issueIndex === -1) {
       return NextResponse.json({ error: "Issue not found" }, { status: 404 })
     }
 
-    mockIssues[issueIndex] = {
-      ...mockIssues[issueIndex],
+    issues[issueIndex] = {
+      ...issues[issueIndex],
       ...updates,
       updatedAt: new Date(),
     }
 
-    return NextResponse.json(mockIssues[issueIndex])
+    await saveIssues(issues)
+
+    return NextResponse.json(issues[issueIndex])
   } catch (error) {
     return NextResponse.json({ error: "Failed to update issue" }, { status: 500 })
   }

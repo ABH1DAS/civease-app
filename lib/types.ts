@@ -44,4 +44,17 @@ export interface Analytics {
   satisfactionRate: number
   issuesByCategory: Record<string, number>
   issuesByPriority: Record<string, number>
+  monthlyTrends: { month: string; issues: number; resolved: number }[]
+  dailyResponseTime: { day: string; avgHours: number }[]
+  departmentPerformance: {
+    department: string
+    issuesResolved: number
+    totalIssues: number
+    avgResponseTime: number
+    satisfactionRate: number
+  }[]
+  keyInsights: {
+    strengths: string[]
+    areasForImprovement: string[]
+  }
 }

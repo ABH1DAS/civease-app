@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { mockIssues } from "@/lib/mock-data"
+import { getIssues, saveIssues } from "@/lib/db"
+import { Issue } from "@/lib/types"
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
@@ -7,36 +8,38 @@ export async function GET(request: NextRequest) {
   const status = searchParams.get("status")
   const category = searchParams.get("category")
 
-  let filteredIssues = [...mockIssues]
+  let issues = await getIssues()
 
   if (citizenId) {
-    filteredIssues = filteredIssues.filter((issue) => issue.citizenId === citizenId)
+    issues = issues.filter((issue) => issue.citizenId === citizenId)
   }
 
   if (status) {
-    filteredIssues = filteredIssues.filter((issue) => issue.status === status)
+    issues = issues.filter((issue) => issue.status === status)
   }
 
   if (category) {
-    filteredIssues = filteredIssues.filter((issue) => issue.category === category)
+    issues = issues.filter((issue) => issue.category === category)
   }
 
-  return NextResponse.json(filteredIssues)
+  return NextResponse.json(issues)
 }
 
 export async function POST(request: NextRequest) {
   try {
     const issueData = await request.json()
+    const issues = await getIssues()
 
-    const newIssue = {
-      id: String(mockIssues.length + 1),
+    const newIssue: Issue = {
+      id: String(issues.length + 1),
       ...issueData,
       status: "pending",
       createdAt: new Date(),
       updatedAt: new Date(),
     }
 
-    mockIssues.push(newIssue)
+    issues.push(newIssue)
+    await saveIssues(issues)
 
     return NextResponse.json(newIssue, { status: 201 })
   } catch (error) {

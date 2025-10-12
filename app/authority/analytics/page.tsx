@@ -31,7 +31,7 @@ export default function AnalyticsPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetch("/api/analytics")
+    fetch(`/api/analytics?timeRange=${timeRange}`)
       .then((res) => res.json())
       .then((data) => {
         setAnalytics(data)
@@ -39,16 +39,6 @@ export default function AnalyticsPage() {
       })
       .catch(() => setLoading(false))
   }, [timeRange])
-
-  // Mock data for charts
-  const monthlyData = [
-    { month: "Jan", issues: 45, resolved: 38, satisfaction: 85 },
-    { month: "Feb", issues: 52, resolved: 44, satisfaction: 87 },
-    { month: "Mar", issues: 48, resolved: 41, satisfaction: 89 },
-    { month: "Apr", issues: 61, resolved: 53, satisfaction: 86 },
-    { month: "May", issues: 55, resolved: 49, satisfaction: 91 },
-    { month: "Jun", issues: 67, resolved: 58, satisfaction: 88 },
-  ]
 
   const categoryData = analytics?.issuesByCategory
     ? Object.entries(analytics.issuesByCategory).map(([name, value]) => ({
@@ -63,16 +53,6 @@ export default function AnalyticsPage() {
         value,
       }))
     : []
-
-  const responseTimeData = [
-    { day: "Mon", avgHours: 18 },
-    { day: "Tue", avgHours: 22 },
-    { day: "Wed", avgHours: 16 },
-    { day: "Thu", avgHours: 24 },
-    { day: "Fri", avgHours: 20 },
-    { day: "Sat", avgHours: 28 },
-    { day: "Sun", avgHours: 32 },
-  ]
 
   const COLORS = ["#10b981", "#3b82f6", "#f59e0b", "#ef4444", "#8b5cf6"]
 
@@ -191,7 +171,7 @@ export default function AnalyticsPage() {
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={300}>
-                <AreaChart data={monthlyData}>
+                <AreaChart data={analytics?.monthlyTrends}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="month" />
                   <YAxis />
@@ -256,7 +236,7 @@ export default function AnalyticsPage() {
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={responseTimeData}>
+                <LineChart data={analytics?.dailyResponseTime}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="day" />
                   <YAxis />
@@ -295,86 +275,34 @@ export default function AnalyticsPage() {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="space-y-4">
-                <h4 className="font-semibold text-gray-900">Public Works</h4>
-                <div className="space-y-3">
-                  <div>
-                    <div className="flex justify-between text-sm mb-1">
-                      <span>Issues Resolved</span>
-                      <span>89/102</span>
+              {analytics?.departmentPerformance.map((dept) => (
+                <div key={dept.department} className="space-y-4">
+                  <h4 className="font-semibold text-gray-900">{dept.department}</h4>
+                  <div className="space-y-3">
+                    <div>
+                      <div className="flex justify-between text-sm mb-1">
+                        <span>Issues Resolved</span>
+                        <span>{dept.issuesResolved}/{dept.totalIssues}</span>
+                      </div>
+                      <Progress value={(dept.issuesResolved / dept.totalIssues) * 100} className="h-2" />
                     </div>
-                    <Progress value={87} className="h-2" />
-                  </div>
-                  <div>
-                    <div className="flex justify-between text-sm mb-1">
-                      <span>Avg Response Time</span>
-                      <span>3.2 days</span>
+                    <div>
+                      <div className="flex justify-between text-sm mb-1">
+                        <span>Avg Response Time</span>
+                        <span>{dept.avgResponseTime} days</span>
+                      </div>
+                      <Progress value={100 - (dept.avgResponseTime / 10) * 100} className="h-2" />
                     </div>
-                    <Progress value={75} className="h-2" />
-                  </div>
-                  <div>
-                    <div className="flex justify-between text-sm mb-1">
-                      <span>Satisfaction Rate</span>
-                      <span>91%</span>
+                    <div>
+                      <div className="flex justify-between text-sm mb-1">
+                        <span>Satisfaction Rate</span>
+                        <span>{dept.satisfactionRate}%</span>
+                      </div>
+                      <Progress value={dept.satisfactionRate} className="h-2" />
                     </div>
-                    <Progress value={91} className="h-2" />
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <h4 className="font-semibold text-gray-900">Public Safety</h4>
-                <div className="space-y-3">
-                  <div>
-                    <div className="flex justify-between text-sm mb-1">
-                      <span>Issues Resolved</span>
-                      <span>67/73</span>
-                    </div>
-                    <Progress value={92} className="h-2" />
-                  </div>
-                  <div>
-                    <div className="flex justify-between text-sm mb-1">
-                      <span>Avg Response Time</span>
-                      <span>1.8 days</span>
-                    </div>
-                    <Progress value={90} className="h-2" />
-                  </div>
-                  <div>
-                    <div className="flex justify-between text-sm mb-1">
-                      <span>Satisfaction Rate</span>
-                      <span>94%</span>
-                    </div>
-                    <Progress value={94} className="h-2" />
                   </div>
                 </div>
-              </div>
-
-              <div className="space-y-4">
-                <h4 className="font-semibold text-gray-900">Environment</h4>
-                <div className="space-y-3">
-                  <div>
-                    <div className="flex justify-between text-sm mb-1">
-                      <span>Issues Resolved</span>
-                      <span>42/45</span>
-                    </div>
-                    <Progress value={93} className="h-2" />
-                  </div>
-                  <div>
-                    <div className="flex justify-between text-sm mb-1">
-                      <span>Avg Response Time</span>
-                      <span>5.1 days</span>
-                    </div>
-                    <Progress value={65} className="h-2" />
-                  </div>
-                  <div>
-                    <div className="flex justify-between text-sm mb-1">
-                      <span>Satisfaction Rate</span>
-                      <span>86%</span>
-                    </div>
-                    <Progress value={86} className="h-2" />
-                  </div>
-                </div>
-              </div>
+              ))}
             </div>
           </CardContent>
         </Card>
@@ -393,18 +321,12 @@ export default function AnalyticsPage() {
                   Strengths
                 </h4>
                 <ul className="space-y-2 text-sm text-gray-600">
-                  <li className="flex items-start gap-2">
-                    <div className="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
-                    Public Safety department shows excellent response times (1.8 days average)
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <div className="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
-                    Overall satisfaction rate has improved by 3% this month
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <div className="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
-                    Infrastructure issues are being resolved 12% faster than last quarter
-                  </li>
+                  {analytics?.keyInsights.strengths.map((strength, i) => (
+                    <li key={i} className="flex items-start gap-2">
+                      <div className="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
+                      {strength}
+                    </li>
+                  ))}
                 </ul>
               </div>
 
@@ -414,18 +336,12 @@ export default function AnalyticsPage() {
                   Areas for Improvement
                 </h4>
                 <ul className="space-y-2 text-sm text-gray-600">
-                  <li className="flex items-start gap-2">
-                    <div className="w-2 h-2 bg-orange-500 rounded-full mt-2 flex-shrink-0"></div>
-                    Environment department response time is above target (5.1 days vs 4.0 target)
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <div className="w-2 h-2 bg-orange-500 rounded-full mt-2 flex-shrink-0"></div>
-                    Weekend response times are 40% slower than weekdays
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <div className="w-2 h-2 bg-orange-500 rounded-full mt-2 flex-shrink-0"></div>
-                    High-priority issues need better escalation procedures
-                  </li>
+                  {analytics?.keyInsights.areasForImprovement.map((area, i) => (
+                    <li key={i} className="flex items-start gap-2">
+                      <div className="w-2 h-2 bg-orange-500 rounded-full mt-2 flex-shrink-0"></div>
+                      {area}
+                    </li>
+                  ))}
                 </ul>
               </div>
             </div>

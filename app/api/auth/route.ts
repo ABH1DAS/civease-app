@@ -1,18 +1,17 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { mockUsers } from "@/lib/mock-data"
+import { getUsers } from "@/lib/db"
 
 export async function POST(request: NextRequest) {
   try {
     const { email, password, role } = await request.json()
+    const users = await getUsers()
 
-    // Mock authentication - in real app, verify password hash
-    const user = mockUsers.find((u) => u.email === email && u.role === role)
+    const user = users.find((u) => u.email === email && u.role === role)
 
-    if (!user) {
+    if (!user || user.password !== password) {
       return NextResponse.json({ error: "Invalid credentials" }, { status: 401 })
     }
 
-    // In real app, create JWT token
     const token = `mock-token-${user.id}`
 
     return NextResponse.json({
