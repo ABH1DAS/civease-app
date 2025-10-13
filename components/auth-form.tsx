@@ -4,6 +4,7 @@ import type React from "react"
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import { H } from "@highlight-run/react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -44,6 +45,14 @@ export function AuthForm({ type, role, title, description }: AuthFormProps) {
       }
 
       const data = await response.json()
+
+      // Identify the user for Highlight.io
+      H.identify(data.user.email, {
+        id: data.user.id,
+        name: data.user.name,
+        phone: data.user.phone,
+        role: data.user.role,
+      })
 
       // Store user data in localStorage (in real app, use secure storage)
       localStorage.setItem("user", JSON.stringify(data.user))

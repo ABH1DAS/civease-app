@@ -11,6 +11,8 @@
     "test": "echo \"No tests defined\" && exit 0"
   },
   "dependencies": {
+    "@highlight-run/next": "^7.9.38",
+    "@highlight-run/react": "^21.0.0",
     "@hookform/resolvers": "^3.10.0",
     "@radix-ui/react-accordion": "1.2.2",
     "@radix-ui/react-alert-dialog": "1.1.4",
